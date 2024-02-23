@@ -9,7 +9,5 @@ class CustomTile extends StatefulWidget {
 
 class _CustomTileState extends State<CustomTile> {
   @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
+  Widget build(BuildContext context) => SizedBox();
 }

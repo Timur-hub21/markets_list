@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:markets_list/constants/app_colors.dart';
+import 'package:markets_list/main_screen.dart';
 
 class Application extends StatelessWidget {
   const Application({super.key});
@@ -7,8 +7,6 @@ class Application extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          backgroundColor: AppIcons.blueBackgroundColor,
-        ),
+        home: MainScreen(),
       );
 }
