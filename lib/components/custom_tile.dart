@@ -34,21 +34,25 @@ class _CustomTileState extends State<CustomTile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            SvgPicture.asset(
-              widget.svgIcon,
-              height: 50,
-              width: 50,
-              fit: BoxFit.cover,
-            ),
-            const SizedBox(width: 10),
             Expanded(
-              flex: 2,
-              child: Text(
-                widget.title.toUpperCase(),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                ),
+              flex: 4,
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    widget.svgIcon,
+                    height: 50,
+                    width: 50,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    widget.title.toUpperCase(),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w300,
+                    ),
+                  ),
+                ],
               ),
             ),
             Expanded(
