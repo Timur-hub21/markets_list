@@ -18,8 +18,10 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
 
   late TabController tabController;
 
+  /// Tab first item selection
   bool isFirstItemSelected = true;
 
+  /// Tab second item selection
   bool isSecondItemSelected = false;
 
   @override
@@ -34,6 +36,7 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
     super.dispose();
   }
 
+  /// Toggle currency to favorite
   void toggleFavoritesStatus(CurrencyModel currency) {
     setState(() {
       currency.isFavorite = !currency.isFavorite;
@@ -46,7 +49,50 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
     }
   }
 
-  final List<CurrencyModel> marketsList = <CurrencyModel>[
+  /// Search by markets list
+  List<CurrencyModel> searchByMarketsList(String request) {
+    request = request.toLowerCase();
+    return marketsList
+        .where((currency) =>
+            currency.currencyName.toLowerCase().contains(request) ||
+            currency.tag.toLowerCase().contains(request))
+        .toList();
+  }
+
+  /// Search by favorites list
+  List<CurrencyModel> searchByFavoritesList(String request) {
+    request = request.toLowerCase();
+    return favoritesList
+        .where((currency) =>
+            currency.currencyName.toLowerCase().contains(request) ||
+            currency.tag.toLowerCase().contains(request))
+        .toList();
+  }
+
+  /// Search callback for textfield
+  void onSearchTextChanged(String text) {
+    setState(() {
+      if (text.isEmpty) {
+        filteredMarketsList = List.from(marketsList);
+        filteredFavoritesList = List.from(favoritesList);
+      } else {
+        filteredMarketsList = searchByMarketsList(text);
+        filteredFavoritesList = searchByFavoritesList(text);
+      }
+    });
+  }
+
+  /// Display default or filtered markets list
+  List<CurrencyModel> getDisplayedMarketsList() {
+    return searchController.text.isEmpty ? marketsList : filteredMarketsList;
+  }
+
+  /// Display default or filtered favorites list
+  List<CurrencyModel> getDisplayedFavoritesList() {
+    return searchController.text.isEmpty ? favoritesList : filteredFavoritesList;
+  }
+
+  List<CurrencyModel> marketsList = <CurrencyModel>[
     CurrencyModel(
       currencyName: 'Tether',
       tag: 'Usdt',
@@ -121,7 +167,14 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
     ),
   ];
 
-  final List<CurrencyModel> favoritesList = [];
+  /// Favorite currencies list
+  List<CurrencyModel> favoritesList = [];
+
+  /// Filtered markets list
+  List<CurrencyModel> filteredMarketsList = [];
+
+  /// Filtered favorites list
+  List<CurrencyModel> filteredFavoritesList = [];
 
   @override
   Widget build(BuildContext context) => CustomScrollView(
@@ -146,6 +199,7 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                     ),
                     const SizedBox(height: 10),
                     CupertinoSearchTextField(
+                      onChanged: (String text) => onSearchTextChanged(text),
                       controller: searchController,
                       padding: const EdgeInsets.symmetric(vertical: 13.5),
                       prefixInsets: const EdgeInsets.symmetric(horizontal: 5),
@@ -273,21 +327,18 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                     ),
                   ),
                   sliver: SliverList.separated(
-                    itemCount: marketsList.length,
+                    itemCount: getDisplayedMarketsList().length,
                     itemBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                         child: CustomTile(
-                          title: marketsList[index].tag,
-                          price: marketsList[index].price,
-                          svgIcon: marketsList[index].svgIcon,
-                          percent: marketsList[index].percent,
-                          isPostitive: marketsList[index].isPercentPositive,
-                          isFavorite: marketsList[index].isFavorite,
-                          onTap: () {
-                            toggleFavoritesStatus(marketsList[index]);
-                            print(favoritesList);
-                          },
+                          title: getDisplayedMarketsList()[index].tag,
+                          price: getDisplayedMarketsList()[index].price,
+                          svgIcon: getDisplayedMarketsList()[index].svgIcon,
+                          percent: getDisplayedMarketsList()[index].percent,
+                          isPostitive: getDisplayedMarketsList()[index].isPercentPositive,
+                          isFavorite: getDisplayedMarketsList()[index].isFavorite,
+                          onTap: () => toggleFavoritesStatus(getDisplayedMarketsList()[index]),
                         ),
                       );
                     },
@@ -299,30 +350,31 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                     },
                   ),
                 )
-              : favoritesList.isNotEmpty
+              : getDisplayedFavoritesList().isNotEmpty
                   ? DecoratedSliver(
                       decoration: const BoxDecoration(
                         color: AppColors.whiteBackgroundColor,
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20.0),
                           topRight: Radius.circular(20.0),
+                          bottomLeft: Radius.circular(20.0),
+                          bottomRight: Radius.circular(20.0),
                         ),
                       ),
                       sliver: SliverList.separated(
-                        itemCount: favoritesList.length,
+                        itemCount: getDisplayedFavoritesList().length,
                         itemBuilder: (BuildContext context, int index) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                             child: CustomTile(
-                              title: favoritesList[index].tag,
-                              price: favoritesList[index].price,
-                              svgIcon: favoritesList[index].svgIcon,
-                              percent: favoritesList[index].percent,
-                              isPostitive: favoritesList[index].isPercentPositive,
-                              isFavorite: favoritesList[index].isFavorite,
-                              onTap: () {
-                                toggleFavoritesStatus(favoritesList[index]);
-                              },
+                              title: getDisplayedFavoritesList()[index].tag,
+                              price: getDisplayedFavoritesList()[index].price,
+                              svgIcon: getDisplayedFavoritesList()[index].svgIcon,
+                              percent: getDisplayedFavoritesList()[index].percent,
+                              isPostitive: getDisplayedFavoritesList()[index].isPercentPositive,
+                              isFavorite: getDisplayedFavoritesList()[index].isFavorite,
+                              onTap: () =>
+                                  toggleFavoritesStatus(getDisplayedFavoritesList()[index]),
                             ),
                           );
                         },
