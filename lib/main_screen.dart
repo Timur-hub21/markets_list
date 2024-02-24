@@ -48,26 +48,26 @@ class _MainScreenState extends State<MainScreen> {
           selectedItemColor: AppColors.blueBackgroundColor,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.trending_up, size: 20),
+              icon: Icon(Icons.trending_up, size: 28),
               label: 'Markets',
-              activeIcon: Icon(Icons.trending_up, size: 20, color: AppColors.blueBackgroundColor),
+              activeIcon: Icon(Icons.trending_up, size: 28, color: AppColors.blueBackgroundColor),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.change_circle_outlined, size: 20),
+              icon: Icon(Icons.change_circle_outlined, size: 28),
               label: 'Trade',
               activeIcon: Icon(Icons.change_circle_outlined,
-                  size: 20, color: AppColors.blueBackgroundColor),
+                  size: 28, color: AppColors.blueBackgroundColor),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.wallet, size: 20),
+              icon: Icon(Icons.wallet, size: 28),
               label: 'Portfolio',
-              activeIcon: Icon(Icons.wallet, size: 20, color: AppColors.blueBackgroundColor),
+              activeIcon: Icon(Icons.wallet, size: 28, color: AppColors.blueBackgroundColor),
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle, size: 20),
+              icon: Icon(Icons.account_circle, size: 28),
               label: 'Account',
               activeIcon:
-                  Icon(Icons.account_circle, size: 20, color: AppColors.blueBackgroundColor),
+                  Icon(Icons.account_circle, size: 28, color: AppColors.blueBackgroundColor),
             ),
           ],
         ),
