@@ -14,13 +14,13 @@ class MarketsScreenSliver extends StatefulWidget {
 
 class _MarketsScreenSliverState extends State<MarketsScreenSliver>
     with SingleTickerProviderStateMixin {
-  final ScrollController _scrollController = ScrollController();
-
   final TextEditingController searchController = TextEditingController();
 
   late TabController tabController;
 
   bool isFirstItemSelected = true;
+
+  bool isSecondItemSelected = false;
 
   @override
   void initState() {
@@ -32,6 +32,18 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
   void dispose() {
     tabController.dispose();
     super.dispose();
+  }
+
+  void toggleFavoritesStatus(CurrencyModel currency) {
+    setState(() {
+      currency.isFavorite = !currency.isFavorite;
+    });
+
+    if (currency.isFavorite) {
+      favoritesList.add(currency);
+    } else {
+      favoritesList.remove(currency);
+    }
   }
 
   final List<CurrencyModel> marketsList = <CurrencyModel>[
@@ -109,9 +121,10 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
     ),
   ];
 
+  final List<CurrencyModel> favoritesList = [];
+
   @override
   Widget build(BuildContext context) => CustomScrollView(
-        controller: _scrollController,
         slivers: <Widget>[
           SliverAppBar(
             toolbarHeight: 100,
@@ -164,10 +177,10 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                         borderRadius: BorderRadius.circular(12.0),
                       ),
                       child: TabBar(
-                        labelColor: isFirstItemSelected
+                        labelColor: isFirstItemSelected || isSecondItemSelected
                             ? AppColors.blueBackgroundColor
                             : AppColors.whiteBackgroundColor,
-                        unselectedLabelColor: isFirstItemSelected
+                        unselectedLabelColor: isFirstItemSelected || isSecondItemSelected
                             ? AppColors.whiteBackgroundColor
                             : AppColors.blueBackgroundColor,
                         padding: EdgeInsets.zero,
@@ -184,7 +197,13 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                         ),
                         tabs: [
                           InkWell(
-                            onTap: () => setState(() => isFirstItemSelected = true),
+                            onTap: () {
+                              setState(() {
+                                isFirstItemSelected = true;
+                                isSecondItemSelected = false;
+                                tabController.index = 0;
+                              });
+                            },
                             child: Container(
                               width: MediaQuery.sizeOf(context).width,
                               decoration: BoxDecoration(
@@ -207,14 +226,20 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
                             ),
                           ),
                           InkWell(
-                            onTap: () => setState(() => isFirstItemSelected = false),
+                            onTap: () {
+                              setState(() {
+                                isFirstItemSelected = false;
+                                isSecondItemSelected = true;
+                                tabController.index = 1;
+                              });
+                            },
                             child: Container(
                               width: MediaQuery.sizeOf(context).width,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12.0),
-                                color: isFirstItemSelected
-                                    ? Colors.transparent
-                                    : AppColors.whiteBackgroundColor,
+                                color: isSecondItemSelected
+                                    ? AppColors.whiteBackgroundColor
+                                    : Colors.transparent,
                               ),
                               child: const Tab(
                                 child: Row(
@@ -238,42 +263,90 @@ class _MarketsScreenSliverState extends State<MarketsScreenSliver>
             ),
           ),
           const SliverToBoxAdapter(child: SizedBox(height: 20)),
-          DecoratedSliver(
-            decoration: const BoxDecoration(
-              color: AppColors.whiteBackgroundColor,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            sliver: SliverList.separated(
-              itemCount: marketsList.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  child: CustomTile(
-                    title: marketsList[index].tag,
-                    price: marketsList[index].price,
-                    svgIcon: marketsList[index].svgIcon,
-                    percent: marketsList[index].percent,
-                    isPostitive: marketsList[index].isPercentPositive,
-                    isFavorite: marketsList[index].isFavorite,
-                    onTap: () {
-                      setState(() {
-                        marketsList[index].isFavorite = !marketsList[index].isFavorite;
-                      });
+          tabController.index == 0
+              ? DecoratedSliver(
+                  decoration: const BoxDecoration(
+                    color: AppColors.whiteBackgroundColor,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  sliver: SliverList.separated(
+                    itemCount: marketsList.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                        child: CustomTile(
+                          title: marketsList[index].tag,
+                          price: marketsList[index].price,
+                          svgIcon: marketsList[index].svgIcon,
+                          percent: marketsList[index].percent,
+                          isPostitive: marketsList[index].isPercentPositive,
+                          isFavorite: marketsList[index].isFavorite,
+                          onTap: () {
+                            toggleFavoritesStatus(marketsList[index]);
+                            print(favoritesList);
+                          },
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Divider(thickness: 1.5),
+                      );
                     },
                   ),
-                );
-              },
-              separatorBuilder: (BuildContext context, int index) {
-                return const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: Divider(thickness: 1.5),
-                );
-              },
-            ),
-          ),
+                )
+              : favoritesList.isNotEmpty
+                  ? DecoratedSliver(
+                      decoration: const BoxDecoration(
+                        color: AppColors.whiteBackgroundColor,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                      ),
+                      sliver: SliverList.separated(
+                        itemCount: favoritesList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                            child: CustomTile(
+                              title: favoritesList[index].tag,
+                              price: favoritesList[index].price,
+                              svgIcon: favoritesList[index].svgIcon,
+                              percent: favoritesList[index].percent,
+                              isPostitive: favoritesList[index].isPercentPositive,
+                              isFavorite: favoritesList[index].isFavorite,
+                              onTap: () {
+                                toggleFavoritesStatus(favoritesList[index]);
+                              },
+                            ),
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: Divider(thickness: 1.5),
+                          );
+                        },
+                      ),
+                    )
+                  : const SliverToBoxAdapter(
+                      child: Center(
+                        child: Text(
+                          'Favorites list is empty, add currencies on previous tab',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColors.whiteBackgroundColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                    ),
         ],
       );
 }
