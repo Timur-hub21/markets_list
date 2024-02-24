@@ -81,17 +81,18 @@ class _CustomTileState extends State<CustomTile> {
                 ],
               ),
             ),
+            const SizedBox(width: 10),
             GestureDetector(
               onTap: widget.onTap,
               child: widget.isFavorite
                   ? const Icon(
                       Icons.star,
-                      size: 35,
+                      size: 26,
                       color: Colors.grey,
                     )
                   : const Icon(
                       Icons.star_border,
-                      size: 35,
+                      size: 26,
                       color: Colors.grey,
                     ),
             )
